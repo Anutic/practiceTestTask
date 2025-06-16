@@ -1,29 +1,23 @@
 import { useState } from 'react';
-import { useDrag } from 'react-dnd';
+import { useDragAndDrop } from '../../hooks/useDragAndDrop';
 import type { ICard, Priority } from '../../types/board';
 import { CardContainer, CardHeader, CardContent, PriorityBadge, EditButton } from './styles.tsx';
 
 interface CardProps {
   card: ICard;
+  columnId: string;
   onEdit: (updatedCard: ICard) => void;
   onDelete: () => void;
 }
 
-const Card = ({ card, onEdit, onDelete }: CardProps) => {
+const Card = ({ card, columnId, onEdit, onDelete }: CardProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState(card);
 
-  const [{ isDragging }, drag] = useDrag(() => ({
-    type: 'CARD',
-    item: { id: card.id },
-    collect: (monitor) => ({
-      isDragging: !!monitor.isDragging(),
-    }),
-  }));
-
-  const setDragRef = (element: HTMLDivElement | null) => {
-    drag(element);
-  };
+  const { ref, isDragging } = useDragAndDrop<HTMLDivElement>('CARD', {
+    id: card.id,
+    columnId,
+  });
 
   const handleSave = () => {
     onEdit(editData);
@@ -31,7 +25,7 @@ const Card = ({ card, onEdit, onDelete }: CardProps) => {
   };
 
   return (
-    <CardContainer ref={setDragRef} $isDragging={isDragging}>
+    <CardContainer ref={ref} $isDragging={isDragging}>
       {isEditing ? (
         <div>
           <input
@@ -62,7 +56,7 @@ const Card = ({ card, onEdit, onDelete }: CardProps) => {
                 {card.priority}
               </PriorityBadge>
             )}
-            <h3>{card.title}</h3> 
+            <h3>{card.title}</h3>
           </CardHeader>
           <CardContent>
             <p>{card.description}</p>

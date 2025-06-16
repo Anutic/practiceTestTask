@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { useDrop } from 'react-dnd';
 import { useDispatch } from 'react-redux';
-import { addCard, moveCard, updateCard, removeCard } from '../../store/slices/boardSlice';
+import { useDragAndDrop } from '../../hooks/useDragAndDrop';
+import { addCard, updateCard, removeCard } from '../../store/slices/boardSlice';
 import type { IColumn, Priority } from '../../types/board';
 import Card from '../Card/Card';
 import { AddCardForm } from './AddCardForm';
@@ -24,25 +24,10 @@ const Column = ({ column, onColorChange }: ColumnProps) => {
   const dispatch = useDispatch();
   const [showAddForm, setShowAddForm] = useState(false);
 
-  const [{ isOver }, drop] = useDrop(() => ({
-    accept: 'CARD',
-    drop: (item: { id: string; columnId: string }) => {
-      dispatch(
-        moveCard({
-          sourceColumnId: item.columnId,
-          targetColumnId: column.id,
-          cardId: item.id,
-        })
-      );
-    },
-    collect: (monitor) => ({
-      isOver: !!monitor.isOver(),
-    }),
-  }));
-
-  const setDropRef = (element: HTMLDivElement | null) => {
-    drop(element);
-  };
+  const { ref, isOver } = useDragAndDrop<HTMLDivElement>('CARD', {
+    id: column.id,
+    columnId: column.id,
+  });
 
   const handleAddCard = (title: string, description: string, priority?: Priority) => {
     dispatch(addCard({
@@ -53,9 +38,9 @@ const Column = ({ column, onColorChange }: ColumnProps) => {
   };
 
   return (
-    <ColumnContainer $isOver={isOver} ref={setDropRef}>
+    <ColumnContainer $isOver={isOver} ref={ref}>
       <ColumnHeader $backgroundColor={column.color}>
-        <Counter>{column.cards.length}</Counter> 
+        <Counter>{column.cards.length}</Counter>
         <ColumnTitle>{column.title}</ColumnTitle>
         <AddIcon>+</AddIcon>
       </ColumnHeader>
@@ -64,6 +49,7 @@ const Column = ({ column, onColorChange }: ColumnProps) => {
           <Card
             key={card.id}
             card={card}
+            columnId={column.id}
             onEdit={(updatedCard) => dispatch(updateCard({ columnId: column.id, card: updatedCard }))}
             onDelete={() => dispatch(removeCard({ columnId: column.id, cardId: card.id }))}
           />
