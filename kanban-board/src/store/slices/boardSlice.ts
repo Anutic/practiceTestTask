@@ -1,16 +1,15 @@
 import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import type { IBoardState, ICard, IColumn } from '../../types/board';
+import { loadFromLocalStorage } from '../../utils/storage';
 
-const initialState: IBoardState = {
-
+const initialState: IBoardState = loadFromLocalStorage('board') || {
   columns: [
     { id: '1', title: 'To Do', color: '#4f46e5', cards: [] },
     { id: '2', title: 'In Progress', color: '#f59e0b', cards: [] },
     { id: '3', title: 'Done', color: '#22c55e', cards: [] },
   ],
 };
-
 const boardSlice = createSlice({
   name: 'board',
   initialState,
