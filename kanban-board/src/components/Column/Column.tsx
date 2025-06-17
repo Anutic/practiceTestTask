@@ -19,9 +19,10 @@ import {
 interface ColumnProps {
   column: IColumn;
   onColorChange: (color: string) => void;
+  onAddColumnClick?: () => void; 
 }
 
-const Column = ({ column }: ColumnProps) => {
+const Column = ({ column, onColorChange, onAddColumnClick }: ColumnProps) => { 
   const dispatch = useDispatch();
   const [showAddForm, setShowAddForm] = useState(false);
   const [isColumnActive, setIsColumnActive] = useState(false);
@@ -64,7 +65,7 @@ const Column = ({ column }: ColumnProps) => {
       <ColumnHeader $backgroundColor={column.color}>
         <Counter>{column.cards.length}</Counter>
         <ColumnTitle>{column.title}</ColumnTitle>
-        <AddIcon>+</AddIcon>
+        <AddIcon onClick={onAddColumnClick}>+</AddIcon> 
         {isColumnActive && (
           <DeleteButton onClick={handleDeleteColumn}>
             Delete

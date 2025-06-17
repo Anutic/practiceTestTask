@@ -86,7 +86,7 @@ export const AddIcon = styled.div`
   font-size: 25px;
   color: white;
   font-weight: bold;
-  cursor: default; 
+  cursor: pointer; 
 `;
 
 export const AddCardFormContainer = styled.form`

@@ -90,7 +90,7 @@ const DEFAULT_COLORS = [
 
 const AddColumnForm: React.FC<AddColumnFormProps> = ({ onAdd, onCancel }) => {
   const [title, setTitle] = useState('');
-  const [selectedColor, setSelectedColor] = useState(DEFAULT_COLORS[3]); // default to green
+  const [selectedColor, setSelectedColor] = useState(DEFAULT_COLORS[3]); 
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
