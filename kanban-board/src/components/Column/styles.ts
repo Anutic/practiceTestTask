@@ -162,3 +162,18 @@ export const Counter = styled.div`
   font-weight: normal;
   color: #666;
 `;
+
+export const DeleteButton = styled.button`
+  padding: 6px 12px;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 14px;
+  background-color: #ff4d4f;
+  color: white;
+  margin-left: 8px;
+
+  &:hover {
+    background-color: #ff7875;
+  }
+`;

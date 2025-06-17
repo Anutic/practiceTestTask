@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useDragAndDrop } from '../../hooks/useDragAndDrop';
 import type { ICard, Priority } from '../../types/board';
-import { CardContainer, CardHeader, CardContent, PriorityBadge, EditButton } from './styles.tsx';
+import { CardContainer, CardHeader, CardContent, PriorityBadge, EditButton, EditForm, EditInput, EditSelect, EditTextarea, ButtonGroup, SaveButton, CancelButton } from './styles.tsx';
 
 interface CardProps {
   card: ICard;
@@ -26,17 +26,19 @@ const Card = ({ card, columnId, onEdit, onDelete }: CardProps) => {
 
   return (
     <CardContainer ref={ref} $isDragging={isDragging}>
-      {isEditing ? (
-        <div>
-          <input
+        {isEditing ? (
+        <EditForm>
+          <EditInput
             value={editData.title}
             onChange={(e) => setEditData({ ...editData, title: e.target.value })}
+            placeholder="Title"
           />
-          <textarea
+          <EditTextarea
             value={editData.description}
             onChange={(e) => setEditData({ ...editData, description: e.target.value })}
+            placeholder="Description"
           />
-          <select
+          <EditSelect
             value={editData.priority}
             onChange={(e) => setEditData({ ...editData, priority: e.target.value as Priority })}
           >
@@ -44,10 +46,12 @@ const Card = ({ card, columnId, onEdit, onDelete }: CardProps) => {
             <option value="Low">Low</option>
             <option value="Medium">Medium</option>
             <option value="High">High</option>
-          </select>
-          <button onClick={handleSave}>Save</button>
-          <button onClick={() => setIsEditing(false)}>Cancel</button>
-        </div>
+          </EditSelect>
+          <ButtonGroup>
+            <SaveButton onClick={handleSave}>Save</SaveButton>
+            <CancelButton onClick={() => setIsEditing(false)}>Cancel</CancelButton>
+          </ButtonGroup>
+        </EditForm>
       ) : (
         <>
           <CardHeader>

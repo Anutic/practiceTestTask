@@ -20,7 +20,7 @@ export interface IBoardState {
 
 export interface KanbanBoardProps {
   columns: IColumn[];
-  updateColumns: (columns: IColumn[]) => void; // Переименовали setColumns
+  updateColumns: (columns: IColumn[]) => void; 
   onAddColumn: (title: string, color: string) => void;
   onColumnColorChange: (columnId: string, color: string) => void;
 }

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useDragAndDrop } from '../../hooks/useDragAndDrop';
-import { addCard, updateCard, removeCard } from '../../store/slices/boardSlice';
+import { addCard, updateCard, removeCard, removeColumn } from '../../store/slices/boardSlice';
 import type { IColumn, Priority } from '../../types/board';
 import Card from '../Card/Card';
 import { AddCardForm } from './AddCardForm';
@@ -12,7 +12,8 @@ import {
   CardsList,
   AddCardButton,
   Counter,
-  AddIcon
+  AddIcon,
+  DeleteButton
 } from './styles';
 
 interface ColumnProps {
@@ -20,9 +21,10 @@ interface ColumnProps {
   onColorChange: (color: string) => void;
 }
 
-const Column = ({ column, onColorChange }: ColumnProps) => {
+const Column = ({ column }: ColumnProps) => {
   const dispatch = useDispatch();
   const [showAddForm, setShowAddForm] = useState(false);
+  const [isColumnActive, setIsColumnActive] = useState(false);
 
   const { ref, isOver } = useDragAndDrop<HTMLDivElement>('CARD', {
     id: column.id,
@@ -37,12 +39,37 @@ const Column = ({ column, onColorChange }: ColumnProps) => {
     setShowAddForm(false);
   };
 
+  const handleDeleteColumn = (e: React.MouseEvent) => {
+    e.stopPropagation(); 
+    dispatch(removeColumn(column.id));
+    setIsColumnActive(false);
+  };
+
+  const handleColumnClick = () => {
+    setIsColumnActive(true);
+  };
+
+  const handleColumnBlur = () => {
+    setIsColumnActive(false);
+  };
+
   return (
-    <ColumnContainer $isOver={isOver} ref={ref}>
+    <ColumnContainer 
+      $isOver={isOver} 
+      ref={ref} 
+      onClick={handleColumnClick}
+      onBlur={handleColumnBlur}
+      tabIndex={0}
+    >
       <ColumnHeader $backgroundColor={column.color}>
         <Counter>{column.cards.length}</Counter>
         <ColumnTitle>{column.title}</ColumnTitle>
         <AddIcon>+</AddIcon>
+        {isColumnActive && (
+          <DeleteButton onClick={handleDeleteColumn}>
+            Delete
+          </DeleteButton>
+        )}
       </ColumnHeader>
       <CardsList>
         {column.cards.map((card) => (
