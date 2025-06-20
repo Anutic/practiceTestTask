@@ -191,4 +191,9 @@ KanbanBoard.defaultProps = {
   useRedux: true
 };
 
+// const KanbanBoard = ({ useRedux }: { useRedux: boolean }) => {
+//   throw new Error('Test error in KanbanBoard');
+//   return <div>Kanban Board Content</div>;
+// };
+
 export default KanbanBoard;

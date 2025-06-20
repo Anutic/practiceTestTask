@@ -1,4 +1,5 @@
 import React, { Component, type ErrorInfo, type ReactNode } from 'react';
+import { ErrorContainer, ErrorBox, ErrorTitle, ErrorMessage, RetryButton } from './styles';
 
 interface ErrorBoundaryProps {
   children: ReactNode;
@@ -19,12 +20,25 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
     console.error('Error:', error, errorInfo);
   }
 
+  resetError = () => {
+    this.setState({ hasError: false });
+  };
+
   render(): ReactNode {
     if (this.state.hasError) {
-      return <div>Something went wrong</div>;
+      return (
+        <ErrorContainer>
+          <ErrorBox>
+            <ErrorTitle>Oops, something went wrong</ErrorTitle>
+            <ErrorMessage>
+              An unexpected error occurred. Please try again.
+            </ErrorMessage>
+            <RetryButton onClick={this.resetError}>Try Again</RetryButton>
+          </ErrorBox>
+        </ErrorContainer>
+      );
     }
     return this.props.children;
   }
 }
-
 export default ErrorBoundary;

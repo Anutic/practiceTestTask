@@ -25,7 +25,7 @@ interface ColumnProps {
 const Column = ({ column, onColorChange, onAddColumnClick }: ColumnProps) => { 
   const dispatch = useDispatch();
   const [showAddForm, setShowAddForm] = useState(false);
-  const [isColumnActive, setIsColumnActive] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
 
   const { ref, isOver } = useDragAndDrop<HTMLDivElement>('CARD', {
     id: column.id,
@@ -43,30 +43,29 @@ const Column = ({ column, onColorChange, onAddColumnClick }: ColumnProps) => {
   const handleDeleteColumn = (e: React.MouseEvent) => {
     e.stopPropagation(); 
     dispatch(removeColumn(column.id));
-    setIsColumnActive(false);
   };
 
-  const handleColumnClick = () => {
-    setIsColumnActive(true);
+  const handleMouseEnter = () => {
+    setIsHovered(true);
   };
 
-  const handleColumnBlur = () => {
-    setIsColumnActive(false);
+  const handleMouseLeave = () => {
+    setIsHovered(false);
   };
 
   return (
     <ColumnContainer 
       $isOver={isOver} 
       ref={ref} 
-      onClick={handleColumnClick}
-      onBlur={handleColumnBlur}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
       tabIndex={0}
     >
       <ColumnHeader $backgroundColor={column.color}>
         <Counter>{column.cards.length}</Counter>
         <ColumnTitle>{column.title}</ColumnTitle>
         <AddIcon onClick={onAddColumnClick}>+</AddIcon> 
-        {isColumnActive && (
+        {isHovered && (
           <DeleteButton onClick={handleDeleteColumn}>
             Delete
           </DeleteButton>
