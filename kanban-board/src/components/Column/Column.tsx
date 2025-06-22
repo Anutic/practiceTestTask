@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useDispatch } from 'react-redux';
-import { useDragAndDrop } from '../../hooks/useDragAndDrop';
+import { useNativeDragAndDrop } from '../../hooks/useDragAndDrop';
 import { addCard, updateCard, removeCard, removeColumn } from '../../store/slices/boardSlice';
 import type { IColumn, Priority } from '../../types/board';
 import Card from '../Card/Card';
@@ -19,29 +19,33 @@ import {
 interface ColumnProps {
   column: IColumn;
   onColorChange: (color: string) => void;
-  onAddColumnClick?: () => void; 
+  onAddColumnClick?: () => void;
 }
 
-const Column = ({ column, onColorChange, onAddColumnClick }: ColumnProps) => { 
+const Column = ({ column, onAddColumnClick }: ColumnProps) => {
   const dispatch = useDispatch();
   const [showAddForm, setShowAddForm] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const dropContainerRef = useRef<HTMLDivElement>(null);
 
-  const { ref, isOver } = useDragAndDrop<HTMLDivElement>('CARD', {
-    id: column.id,
+  const { isOver } = useNativeDragAndDrop({
+    type: 'CARD',
     columnId: column.id,
+    dropContainerRef,
   });
 
-  const handleAddCard = (title: string, description: string, priority?: Priority) => {
-    dispatch(addCard({
-      columnId: column.id,
-      card: { title, description, priority }
-    }));
+  const handleAddCard = (title: string, description?: string, priority?: Priority) => {
+    dispatch(
+      addCard({
+        columnId: column.id,
+        card: { title, description: description || '', priority }
+      })
+    );
     setShowAddForm(false);
   };
 
   const handleDeleteColumn = (e: React.MouseEvent) => {
-    e.stopPropagation(); 
+    e.stopPropagation();
     dispatch(removeColumn(column.id));
   };
 
@@ -54,9 +58,9 @@ const Column = ({ column, onColorChange, onAddColumnClick }: ColumnProps) => {
   };
 
   return (
-    <ColumnContainer 
-      $isOver={isOver} 
-      ref={ref} 
+    <ColumnContainer
+      $isOver={isOver}
+      ref={dropContainerRef}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       tabIndex={0}
@@ -64,7 +68,7 @@ const Column = ({ column, onColorChange, onAddColumnClick }: ColumnProps) => {
       <ColumnHeader $backgroundColor={column.color}>
         <Counter>{column.cards.length}</Counter>
         <ColumnTitle>{column.title}</ColumnTitle>
-        <AddIcon onClick={onAddColumnClick}>+</AddIcon> 
+        <AddIcon onClick={onAddColumnClick}>+</AddIcon>
         {isHovered && (
           <DeleteButton onClick={handleDeleteColumn}>
             Delete

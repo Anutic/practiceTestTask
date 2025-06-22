@@ -5,8 +5,7 @@ import { setColumns, addColumn, updateColumnColor } from '../../store/slices/boa
 import Column from '../Column/Column';
 import AddColumnForm from './AddColumnForm';
 import { BoardContainer, AddColumnButton, Counter, PlusIcon } from './styles';
-import styled from 'styled-components';
-import type { IBoardState, KanbanBoardProps, IColumn } from '@/types/board';
+import type { KanbanBoardProps, IColumn } from '@/types/board';
 import type { AppDispatch, RootState } from '../../store';
 
 
@@ -105,7 +104,6 @@ const KanbanBoard = (props: KanbanBoardComponentProps) => {
 
   const {
     columns,
-    updateColumns,
     onAddColumn,
     onColumnColorChange
   } = props as KanbanBoardProps;

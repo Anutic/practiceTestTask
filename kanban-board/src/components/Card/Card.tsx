@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { useDragAndDrop } from '../../hooks/useDragAndDrop';
+import { useNativeDragAndDrop } from '../../hooks/useDragAndDrop';
 import type { ICard, Priority } from '../../types/board';
-import { CardContainer, CardHeader, CardContent, PriorityBadge, EditButton, EditForm, EditInput, EditSelect, EditTextarea, ButtonGroup, SaveButton, CancelButton } from './styles.tsx';
+import { CardContainer, CardHeader, CardContent, PriorityBadge, EditButton, EditForm, EditInput, EditSelect, EditTextarea, ButtonGroup, SaveButton, CancelButton } from './styles';
 
 interface CardProps {
   card: ICard;
@@ -14,8 +14,9 @@ const Card = ({ card, columnId, onEdit, onDelete }: CardProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState(card);
 
-  const { ref, isDragging } = useDragAndDrop<HTMLDivElement>('CARD', {
-    id: card.id,
+  const { dragRef, isDragging } = useNativeDragAndDrop({
+    type: 'CARD',
+    cardId: card.id,
     columnId,
   });
 
@@ -25,8 +26,8 @@ const Card = ({ card, columnId, onEdit, onDelete }: CardProps) => {
   };
 
   return (
-    <CardContainer ref={ref} $isDragging={isDragging}>
-        {isEditing ? (
+    <CardContainer ref={dragRef} $isDragging={isDragging} draggable={!isEditing}>
+      {isEditing ? (
         <EditForm>
           <EditInput
             value={editData.title}
