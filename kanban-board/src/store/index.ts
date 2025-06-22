@@ -1,6 +1,7 @@
-import { configureStore } from '@reduxjs/toolkit';
+import { configureStore,  } from '@reduxjs/toolkit';
 import boardReducer from './slices/boardSlice';
 import { saveToLocalStorage } from '../utils/storage';
+
 
 const localStorageMiddleware = ({ getState }: { getState: () => RootState }) => {
   return (next: (action: any) => void) => (action: any) => {
