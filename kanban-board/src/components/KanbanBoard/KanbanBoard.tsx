@@ -4,7 +4,7 @@ import { loadFromLocalStorage, saveToLocalStorage } from '../../utils/storage';
 import { setColumns, addColumn, updateColumnColor } from '../../store/slices/boardSlice';
 import Column from '../Column/Column';
 import AddColumnForm from './AddColumnForm';
-import { BoardContainer } from './styles';
+import { BoardContainer, AddColumnButton, Counter, PlusIcon } from './styles';
 import styled from 'styled-components';
 import type { IBoardState, KanbanBoardProps, IColumn } from '@/types/board';
 import type { AppDispatch, RootState } from '../../store';
@@ -15,45 +15,6 @@ const STORAGE_KEY = 'kanban-board';
 type KanbanBoardComponentProps = KanbanBoardProps | {
   useRedux: true;
 };
-
-const AddColumnButton = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background-color: #d9e6d9;
-  border-radius: 20px;
-  padding: 4px 12px;
-  font-size: 14px;
-  color: #fff;
-  cursor: pointer;
-  width: 200px;
-  height: 36px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  line-height: 1;
-
-  &:hover {
-    background-color: #cce0cc;
-  }
-`;
-
-const Counter = styled.div`
-  width: 24px;
-  height: 24px;
-  background-color: #fff;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-right: 8px;
-  font-weight: normal;
-  color: #666;
-`;
-
-const PlusIcon = styled.div`
-  font-size: 25px;
-  font-weight: bold;
-  color: white;
-`;
 
 const KanbanBoard = (props: KanbanBoardComponentProps) => {
   const [showAddColumn, setShowAddColumn] = useState(false);
