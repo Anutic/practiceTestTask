@@ -18,11 +18,12 @@ import {
 
 interface ColumnProps {
   column: IColumn;
+  boardId: string;
   onColorChange: (color: string) => void;
   onAddColumnClick?: () => void;
 }
 
-const Column = ({ column, onAddColumnClick }: ColumnProps) => {
+const Column = ({ column, boardId, onColorChange, onAddColumnClick }: ColumnProps) => {
   const dispatch = useDispatch();
   const [showAddForm, setShowAddForm] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -31,12 +32,14 @@ const Column = ({ column, onAddColumnClick }: ColumnProps) => {
   const { isOver } = useNativeDragAndDrop({
     type: 'CARD',
     columnId: column.id,
+    boardId, 
     dropContainerRef,
   });
 
   const handleAddCard = (title: string, description?: string, priority?: Priority) => {
     dispatch(
       addCard({
+        boardId,
         columnId: column.id,
         card: { title, description: description || '', priority }
       })
@@ -46,7 +49,7 @@ const Column = ({ column, onAddColumnClick }: ColumnProps) => {
 
   const handleDeleteColumn = (e: React.MouseEvent) => {
     e.stopPropagation();
-    dispatch(removeColumn(column.id));
+    dispatch(removeColumn({ boardId, columnId: column.id }));
   };
 
   const handleMouseEnter = () => {
@@ -81,8 +84,9 @@ const Column = ({ column, onAddColumnClick }: ColumnProps) => {
             key={card.id}
             card={card}
             columnId={column.id}
-            onEdit={(updatedCard) => dispatch(updateCard({ columnId: column.id, card: updatedCard }))}
-            onDelete={() => dispatch(removeCard({ columnId: column.id, cardId: card.id }))}
+            boardId={boardId} 
+            onEdit={(updatedCard) => dispatch(updateCard({ boardId, columnId: column.id, card: updatedCard }))}
+            onDelete={() => dispatch(removeCard({ boardId, columnId: column.id, cardId: card.id }))}
           />
         ))}
       </CardsList>

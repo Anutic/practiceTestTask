@@ -5,17 +5,20 @@ import { moveCard } from '../store/slices/boardSlice';
 interface DragItem {
   cardId: string;
   sourceColumnId: string;
+  boardId: string;
 }
 
 export const useNativeDragAndDrop = ({
   type,
   cardId,
   columnId,
+  boardId, 
   dropContainerRef,
 }: {
   type: 'CARD';
   cardId?: string;
   columnId: string;
+  boardId: string;
   dropContainerRef?: React.RefObject<HTMLDivElement | null>;
 }) => {
   const dispatch = useDispatch();
@@ -26,11 +29,11 @@ export const useNativeDragAndDrop = ({
   const handleDragStart = useCallback((e: DragEvent) => {
     if (!dragRef.current || !cardId) return;
     isDragging.current = true;
-    const dragData: DragItem = { cardId, sourceColumnId: columnId };
+    const dragData: DragItem = { cardId, sourceColumnId: columnId, boardId }; // Include boardId
     e.dataTransfer?.setData('application/json', JSON.stringify(dragData));
     e.dataTransfer!.effectAllowed = 'move';
     dragRef.current.style.opacity = '0.5';
-  }, [cardId, columnId]);
+  }, [cardId, columnId, boardId]);
 
   const handleDragEnter = useCallback((e: DragEvent) => {
     e.preventDefault();
@@ -68,6 +71,7 @@ export const useNativeDragAndDrop = ({
         if (type === 'CARD') {
           dispatch(
             moveCard({
+              boardId, 
               sourceColumnId: draggedItem.sourceColumnId,
               targetColumnId: columnId,
               cardId: draggedItem.cardId,
@@ -78,7 +82,7 @@ export const useNativeDragAndDrop = ({
         console.error('Error parsing drag data:', error);
       }
     },
-    [dispatch, type, columnId]
+    [dispatch, type, columnId, boardId]
   );
 
   const handleDragEnd = useCallback(() => {

@@ -1,21 +1,30 @@
-
 import type { IBoardState } from '@/types/board';
+import { defaultColumns } from '@/types/board';
 
-export const loadFromLocalStorage = (key: string): IBoardState | null => {
+const defaultBoard = {
+  id: 'board-1',
+  title: 'Default Board',
+  columns: defaultColumns.map((col, index) => ({
+    ...col,
+    id: `col-board-1-${index + 1}`,
+  })),
+};
+
+export const loadFromLocalStorage = (key: string): IBoardState => {
   try {
     const serializedData = localStorage.getItem(key);
     if (serializedData === null) {
-      return null;
+      return { boards: [defaultBoard] };
     }
     const data = JSON.parse(serializedData);
 
-    if (data && Array.isArray(data.columns)) {
+    if (data && Array.isArray(data.boards)) {
       return data as IBoardState;
     }
-    return null;
+    return { boards: [defaultBoard] };
   } catch (error) {
     console.error('Error loading from localStorage:', error);
-    return null;
+    return { boards: [defaultBoard] };
   }
 };
 

@@ -1,23 +1,35 @@
-import { configureStore,  } from '@reduxjs/toolkit';
+import { configureStore, Tuple } from '@reduxjs/toolkit';
+
+import type { Middleware, EnhancedStore, } from '@reduxjs/toolkit';
 import boardReducer from './slices/boardSlice';
-import { saveToLocalStorage } from '../utils/storage';
+import { loadFromLocalStorage, saveToLocalStorage } from '../utils/storage';
+import type { IBoardState } from '@/types/board';
 
+export type RootState = {
+  board: IBoardState;
+};
 
-const localStorageMiddleware = ({ getState }: { getState: () => RootState }) => {
-  return (next: (action: any) => void) => (action: any) => {
+const localStorageMiddleware: Middleware<{}, RootState> = ({ getState }) => {
+  return (next) => (action) => {
     const result = next(action);
     saveToLocalStorage('board', getState().board);
     return result;
   };
 };
 
-export const store = configureStore({
+const preloadedState: RootState = {
+  board: loadFromLocalStorage('board'),
+};
+
+export const store: EnhancedStore<RootState> = configureStore({
   reducer: {
     board: boardReducer,
   },
+  preloadedState,
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(localStorageMiddleware),
+    getDefaultMiddleware().concat(localStorageMiddleware) as Tuple<
+      [typeof localStorageMiddleware, ...ReturnType<typeof getDefaultMiddleware>]
+    >,
 });
 
-export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;

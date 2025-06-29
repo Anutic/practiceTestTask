@@ -1,25 +1,40 @@
 import { useEffect, useState, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { loadFromLocalStorage, saveToLocalStorage } from '../../utils/storage';
-import { setColumns, addColumn, updateColumnColor } from '../../store/slices/boardSlice';
+import { saveToLocalStorage } from '../../utils/storage';
+import { addColumn, updateColumnColor } from '../../store/slices/boardSlice';
 import Column from '../Column/Column';
 import AddColumnForm from './AddColumnForm';
 import { BoardContainer, AddColumnButton, Counter, PlusIcon } from './styles';
-import type { KanbanBoardProps, IColumn } from '@/types/board';
+import type { KanbanBoardProps, IColumn, IBoard } from '@/types/board';
 import type { AppDispatch, RootState } from '../../store';
-
+import styled from 'styled-components';
 
 const STORAGE_KEY = 'kanban-board';
 
-type KanbanBoardComponentProps = KanbanBoardProps | {
-  useRedux: true;
-};
+const BoardSelector = styled.select`
+  margin: 10px;
+  padding: 5px;
+  font-size: 16px;
+`;
+
+type KanbanBoardComponentProps = 
+  | KanbanBoardProps
+  | {
+      useRedux: true;
+      selectedBoardId: string;
+      setSelectedBoardId: (id: string) => void;
+    };
 
 const KanbanBoard = (props: KanbanBoardComponentProps) => {
   const [showAddColumn, setShowAddColumn] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
-  const addColumnButtonRef = useRef<HTMLButtonElement>(null); 
+  const addColumnButtonRef = useRef<HTMLButtonElement>(null);
+  const dispatch = useDispatch<AppDispatch>();
+  const boards = useSelector((state: RootState) => state.board.boards ?? []);
 
+  useEffect(() => {
+    console.log('Boards:', boards); 
+  }, [boards]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -27,7 +42,7 @@ const KanbanBoard = (props: KanbanBoardComponentProps) => {
         showAddColumn &&
         addColumnButtonRef.current &&
         !addColumnButtonRef.current.contains(event.target as Node) &&
-        !(event.target as HTMLElement).closest('.add-icon') 
+        !(event.target as HTMLElement).closest('.add-icon')
       ) {
         setShowAddColumn(false);
       }
@@ -44,61 +59,73 @@ const KanbanBoard = (props: KanbanBoardComponentProps) => {
   };
 
   if ('useRedux' in props && props.useRedux) {
-    const dispatch = useDispatch<AppDispatch>();
-    const columns = useSelector((state: RootState) => state.board.columns);
+    const { selectedBoardId, setSelectedBoardId } = props;
+    const currentBoard: IBoard = boards.find((board: IBoard) => board.id === selectedBoardId) || 
+                        { id: 'default', title: 'Default Board', columns: [] };
+    const columns = currentBoard.columns;
 
     useEffect(() => {
-      const savedData = loadFromLocalStorage(STORAGE_KEY);
-      if (savedData && Array.isArray(savedData.columns)) {
-        dispatch(setColumns(savedData.columns));
-      }
-    }, [dispatch]);
-
-    useEffect(() => {
-      saveToLocalStorage(STORAGE_KEY, { columns });
-    }, [columns]);
+      saveToLocalStorage(STORAGE_KEY, { boards });
+    }, [boards]);
 
     const handleAddColumn = (title: string, color: string) => {
-      dispatch(addColumn({ title, color }));
+      dispatch(addColumn({ boardId: currentBoard.id, column: { title, color } }));
       setShowAddColumn(false);
       setShowAddForm(false);
     };
 
     const handleColumnColorChange = (columnId: string, color: string) => {
-      dispatch(updateColumnColor({ columnId, color }));
+      dispatch(updateColumnColor({ boardId: currentBoard.id, columnId, color }));
     };
 
     return (
-      <BoardContainer>
-        {columns.map((column: IColumn) => (
-          <Column
-            key={column.id}
-            column={column}
-            onColorChange={(color) => handleColumnColorChange(column.id, color)}
-            onAddColumnClick={handleAddColumnClick}
-          />
-        ))}
-        {showAddColumn && !showAddForm && (
-          <AddColumnButton
-            as="button"
-            ref={addColumnButtonRef}
-            onClick={() => setShowAddForm(true)}
-          >
-            <Counter>0</Counter>
-            Column Title
-            <PlusIcon>+</PlusIcon>
-          </AddColumnButton>
-        )}
-        {showAddForm && (
-          <AddColumnForm
-            onAdd={handleAddColumn}
-            onCancel={() => {
-              setShowAddForm(false);
-              setShowAddColumn(false);
-            }}
-          />
-        )}
-      </BoardContainer>
+      <>
+        <BoardSelector 
+          value={selectedBoardId} 
+          onChange={(e) => {
+            console.log('Selected board ID:', e.target.value); 
+            setSelectedBoardId(e.target.value);
+          }}
+        >
+          {boards.map((board: IBoard) => (
+            <option key={board.id} value={board.id}>{board.title}</option>
+          ))}
+          {boards.length === 0 && (
+            <option value="default">No Boards Available</option>
+          )}
+        </BoardSelector>
+        <BoardContainer key={currentBoard.id}>
+          {columns.map((column: IColumn) => (
+            <Column
+              key={column.id}
+              column={column}
+              boardId={currentBoard.id}
+              onColorChange={(color) => handleColumnColorChange(column.id, color)}
+              onAddColumnClick={handleAddColumnClick}
+            />
+          ))}
+          {showAddColumn && !showAddForm && (
+            <AddColumnButton
+              as="button"
+              ref={addColumnButtonRef}
+              onClick={() => setShowAddForm(true)}
+            >
+              <Counter>0</Counter>
+              Column Title
+              <PlusIcon>+</PlusIcon>
+            </AddColumnButton>
+          )}
+          {showAddForm && (
+            <AddColumnForm
+              onAdd={handleAddColumn}
+              onCancel={() => {
+                setShowAddForm(false);
+                setShowAddColumn(false);
+              }}
+            />
+          )}
+        </BoardContainer>
+      </>
     );
   }
 
@@ -114,6 +141,7 @@ const KanbanBoard = (props: KanbanBoardComponentProps) => {
         <Column
           key={column.id}
           column={column}
+          boardId="default"
           onColorChange={(color) => onColumnColorChange(column.id, color)}
           onAddColumnClick={handleAddColumnClick}
         />
@@ -149,10 +177,5 @@ const KanbanBoard = (props: KanbanBoardComponentProps) => {
 KanbanBoard.defaultProps = {
   useRedux: true
 };
-
-// const KanbanBoard = ({ useRedux }: { useRedux: boolean }) => {
-//   throw new Error('Test error in KanbanBoard');
-//   return <div>Kanban Board Content</div>;
-// };
 
 export default KanbanBoard;

@@ -6,11 +6,12 @@ import { CardContainer, CardHeader, CardContent, PriorityBadge, EditButton, Edit
 interface CardProps {
   card: ICard;
   columnId: string;
+  boardId: string; 
   onEdit: (updatedCard: ICard) => void;
   onDelete: () => void;
 }
 
-const Card = ({ card, columnId, onEdit, onDelete }: CardProps) => {
+const Card = ({ card, columnId, boardId, onEdit, onDelete }: CardProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState(card);
 
@@ -18,6 +19,7 @@ const Card = ({ card, columnId, onEdit, onDelete }: CardProps) => {
     type: 'CARD',
     cardId: card.id,
     columnId,
+    boardId, 
   });
 
   const handleSave = () => {
