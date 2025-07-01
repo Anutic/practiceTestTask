@@ -23,7 +23,7 @@ interface ColumnProps {
   onAddColumnClick?: () => void;
 }
 
-const Column = ({ column, boardId, onColorChange, onAddColumnClick }: ColumnProps) => {
+const Column = ({ column, boardId, onAddColumnClick }: ColumnProps) => {
   const dispatch = useDispatch();
   const [showAddForm, setShowAddForm] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
