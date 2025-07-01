@@ -93,3 +93,9 @@ export const PlusIcon = styled.div`
     font-size: 20px;
   }
 `;
+
+export const BoardSelector = styled.select`
+  margin: 10px;
+  padding: 5px;
+  font-size: 16px;
+`;

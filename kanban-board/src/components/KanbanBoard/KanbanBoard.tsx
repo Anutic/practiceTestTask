@@ -4,18 +4,11 @@ import { saveToLocalStorage } from '../../utils/storage';
 import { addColumn, updateColumnColor } from '../../store/slices/boardSlice';
 import Column from '../Column/Column';
 import AddColumnForm from './AddColumnForm';
-import { BoardContainer, AddColumnButton, Counter, PlusIcon } from './styles';
+import { BoardContainer, AddColumnButton, Counter, PlusIcon, BoardSelector } from './styles';
 import type { KanbanBoardProps, IColumn, IBoard } from '@/types/board';
 import type { AppDispatch, RootState } from '../../store';
-import styled from 'styled-components';
 
 const STORAGE_KEY = 'kanban-board';
-
-const BoardSelector = styled.select`
-  margin: 10px;
-  padding: 5px;
-  font-size: 16px;
-`;
 
 type KanbanBoardComponentProps = 
   | KanbanBoardProps
@@ -35,7 +28,7 @@ const KanbanBoard = (props: KanbanBoardComponentProps) => {
   useEffect(() => {
     console.log('Boards:', boards); 
   }, [boards]);
-
+//отдельный хук для этого
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -82,12 +75,12 @@ const KanbanBoard = (props: KanbanBoardComponentProps) => {
       <>
         <BoardSelector 
           value={selectedBoardId} 
-          onChange={(e) => {
+          onChange={(e) => {//выносим в отдельную функция 
             console.log('Selected board ID:', e.target.value); 
             setSelectedBoardId(e.target.value);
           }}
         >
-          {boards.map((board: IBoard) => (
+          {boards.map((board: IBoard) => (//деструктуризировать код
             <option key={board.id} value={board.id}>{board.title}</option>
           ))}
           {boards.length === 0 && (
